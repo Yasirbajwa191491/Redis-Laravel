@@ -15,8 +15,12 @@ use App\Http\Controllers\SearchController;
 |
 */
 
+Route::middleware(['rate.limit'])->group(function () {
+    Route::get('/fetch-address',[SearchController::class,'fetchAllAddresses']);
+    Route::get('/search',[SearchController::class,'search']);
+});
 
-Route::get('/search',[SearchController::class,'search']);
+Route::post('/store-ip',[SearchController::class,'storeIp']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

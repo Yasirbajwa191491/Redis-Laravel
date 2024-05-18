@@ -4,7 +4,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\PostcodeHelper;
+use App\Models\IpAddress;
 use App\Repositories\AddressRepositoryInterface;
 use Illuminate\Http\Request;
 
@@ -16,7 +16,14 @@ class SearchController extends Controller
     {
         $this->addressRepo = $addressRepo;
     }
-
+    public function storeIp(Request $request)
+    {
+        $ip =$request->get('ip_address');
+        // Assuming you have a model called IpAddress and a table to store IPs
+        IpAddress::create(['ip' => $ip]);
+        return response()->json(['message' => 'IP stored successfully']);
+    }
+    
     public function search(Request $request)
     {
         $input = $request->input('query');

@@ -4,12 +4,12 @@
 namespace App\Repositories;
 use App\Models\LiveAddressImported;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 class AddressRepository implements AddressRepositoryInterface
 {
     public function searchByPostcode(string $postcode)
     {
+        
         try {
             $key = "search_by_postcode_{$postcode}";
     $addresses = Redis::get($key);
@@ -56,5 +56,23 @@ class AddressRepository implements AddressRepositoryInterface
             return $e->getMessage();
         }
         
+    }
+
+    public function fetchAllAddresses()
+    {
+        $key = 'all_addresses';
+        $addresses = Redis::get($key);
+
+        if ($addresses) {
+            Log::info("Retrieved all addresses from Redis.");
+            return json_decode($addresses, true);
+        }
+
+        Log::info("No all addresses found in Redis, querying database.");
+        $addresses = LiveAddressImported::all();
+        Redis::setex($key, 3600, json_encode($addresses));
+        Log::info("Stored all addresses in Redis.");
+
+        return $addresses;
     }
 }
